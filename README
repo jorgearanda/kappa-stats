@@ -1,0 +1,24 @@
+This is a little Python script to generate Cohen's Kappa and Weighted Kappa measures for inter-rater reliability (or inter-rater agreement).
+
+Cohen's Kappa is used to find the agreement between two raters and two categories. Weighted Kappa can be used for two raters and any number of ordinal categories.
+
+Two good sources to understand these measures:
+http://en.wikipedia.org/wiki/Cohen%27s_kappa
+http://knol.google.com/k/beno%C3%AEt-curdy/weighted-cohen-s-kappa/32fm4g387q1y7/2#
+
+Requires Python 2.x, NumPy
+
+Usage:
+
+python kappa.py {[-l]|-u|-s} [-v] [-c] FILENAME
+
+FILENAME must be a text file with a pair of integers in each line. The values in each pair correspond to the rating that each of the two reviewers gave to a particular subject. The pairs must be whitespaced-separated (or comma-separated, with the -c flag).
+
+Options:
+--------
+
+-l --linear:     Linear weights for disagreements (default)
+-u --unweighted: Cohen's Kappa (unweighted agreement/disagreement)
+-s --squared:    Squared weights for disagreements
+-v --verbose:    Includes number of categories and subjects in the output
+-c --csv:        For text files with comma-separated values
