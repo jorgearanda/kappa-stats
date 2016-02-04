@@ -2,9 +2,8 @@ This is a little Python script to generate Cohen's Kappa and Weighted Kappa meas
 
 Cohen's Kappa is used to find the agreement between two raters and two categories. Weighted Kappa can be used for two raters and any number of ordinal categories.
 
-Two good sources to understand these measures:
+A good source to understand these measures:
 http://en.wikipedia.org/wiki/Cohen%27s_kappa
-http://knol.google.com/k/beno%C3%AEt-curdy/weighted-cohen-s-kappa/32fm4g387q1y7/2#
 
 Requires Python 2.x, NumPy
 
