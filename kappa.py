@@ -1,25 +1,32 @@
-import sys
+#!/usr/bin/env python
+
+from docopt import docopt
 import numpy as np
 
-def main(args):
-    # Read options
-    unweighted = squared = linear = verbose = csv = False
-    if "-u" in args or "--unweighted" in args:
-        unweighted = True
-    elif "-s" in args or "--squared" in args:
-        squared = True
-    else:
-        linear = True
-    if "-v" in args or "--verbose" in args:
-        verbose = True
-    if "-c" in args or "--csv" in args:
-        csv = True
+usage = """Usage: kappa.py [--help] [--linear|--unweighted|--squared] [--verbose] [--csv] --filename <filename>
 
-    # Read ratings. Last argument is the filename
-    if csv:
-        ratings = np.genfromtxt(args[-1], delimiter=",")
+-h, --help                            Show this
+-l, --linear                          Linear weights for disagreements (default)
+-u, --unweighted                      Cohen's Kappa (unweighted agreement/disagreement)
+-s, --squared                         Squared weights for disagreements
+-v, --verbose                         Include number of categories and subjects in the output
+-c, --csv                             For text files with comma-separated values
+-f <filename>, --filename <filename>  The filename to process, with pairs of integers on each line. The values in each pair correspond to the rating that each of the two reviewers gave to a particular subject. The pairs must be whitespaced-separated (or comma-separated, with the -c flag).
+"""
+
+def main(args):
+    if args.get('--unweighted'):
+        mode = 'unweighted'
+    elif args.get('--squared'):
+        mode = 'squared'
     else:
-        ratings = np.genfromtxt(args[-1])
+        mode = 'linear'
+
+    # Read ratings
+    if args.get('--csv'):
+        ratings = np.genfromtxt(args.get('--filename'), delimiter=',')
+    else:
+        ratings = np.genfromtxt(args.get('--filename'))
 
     categories = int(np.amax(ratings)) + 1
     subjects = ratings.size / 2
@@ -28,11 +35,11 @@ def main(args):
     weighted = np.empty((categories, categories))
     for i in range(categories):
         for j in range(categories):
-            if unweighted:
+            if mode == 'unweighted':
                 weighted[i, j] = (i != j)
-            elif squared:
+            elif mode == 'squared':
                 weighted[i, j] = abs(i - j) ** 2
-            else: #linear
+            else:  #linear
                 weighted[i, j] = abs(i - j)
 
     # Build observed matrix
@@ -56,45 +63,15 @@ def main(args):
     # Calculate kappa
     kappa = 1.0 - (sum(sum(weighted * observed)) / sum(sum(weighted * expected)))
 
-    if verbose:
-        print "Kappa",
-        if unweighted:
-            print "(unweighted):",
-        elif squared:
-            print "(squared):",
-        else:
-            print "(equal weights):",
-        print kappa
-        print "Categories: " + str(categories)
-        print "Subjects: " + str(subjects)
+    if args.get('--verbose'):
+        print('Kappa (' + mode + '):')
+        print(kappa)
+        print('Categories: ' + str(categories))
+        print('Subjects: ' + str(subjects))
     else:
-        print kappa
-
-
-def usage():
-    print "usage: python kappa.py {[-l]|-u|-s} [-v] [-c] FILENAME"
-    print
-    print "Calculates Weighted Kappa and Cohen's Kappa for interrater agreement"
-    print "(two raters, any number of ordinal categories)"
-    print "See http://en.wikipedia.org/wiki/Cohen's_kappa for more information"
-    print
-    print "FILENAME must be a text file with a pair of integers in each line."
-    print "The values in each pair correspond to the rating that each of the"
-    print "two reviewers gave to a particular subject."
-    print "The pairs must be whitespaced-separated (or comma-separated, with the -c flag)."
-    print
-    print "Options:"
-    print "--------"
-    print
-    print "-l --linear:     Linear weights for disagreements (default)"
-    print "-u --unweighted: Cohen's Kappa (unweighted agreement/disagreement)"
-    print "-s --squared:    Squared weights for disagreements"
-    print "-v --verbose:    Includes number of categories and subjects in the output"
-    print "-c --csv:        For text files with comma-separated values"
+        print(kappa)
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 1 or "--help" in sys.argv:
-        usage()
-    else:
-        main(sys.argv[1:])
+    args = docopt(usage, argv=None, help=True, version=None, options_first=False)
+    main(args)
