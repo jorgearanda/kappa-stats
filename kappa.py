@@ -15,13 +15,6 @@ usage = """Usage: kappa.py [--help] [--linear|--unweighted|--squared] [--verbose
 """
 
 def main(args):
-    if args.get('--unweighted'):
-        mode = 'unweighted'
-    elif args.get('--squared'):
-        mode = 'squared'
-    else:
-        mode = 'linear'
-
     # Read ratings
     if args.get('--csv'):
         ratings = np.genfromtxt(args.get('--filename'), delimiter=',')
@@ -35,12 +28,15 @@ def main(args):
     weighted = np.empty((categories, categories))
     for i in range(categories):
         for j in range(categories):
-            if mode == 'unweighted':
+            if args.get('--unweighted'):
                 weighted[i, j] = (i != j)
-            elif mode == 'squared':
+                mode = 'unweighted'
+            elif args.get('--squared'):
                 weighted[i, j] = abs(i - j) ** 2
+                mode = 'squared'
             else:  #linear
                 weighted[i, j] = abs(i - j)
+                mode = 'equal weights'
 
     # Build observed matrix
     observed = np.zeros((categories, categories))
