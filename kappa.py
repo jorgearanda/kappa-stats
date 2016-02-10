@@ -14,17 +14,21 @@ usage = """Usage: kappa.py [--help] [--linear|--unweighted|--squared] [--verbose
 -f <filename>, --filename <filename>  The filename to process, with pairs of integers on each line. The values in each pair correspond to the rating that each of the two reviewers gave to a particular subject. The pairs must be whitespaced-separated (or comma-separated, with the -c flag).
 """
 
-def main(args):
-    # Read ratings
-    if args.get('--csv'):
-        ratings = np.genfromtxt(args.get('--filename'), delimiter=',')
+def get_mode(args):
+    if args.get('--unweighted'):
+        return 'unweighted'
+    elif args.get('--squared'):
+        return 'squared'
     else:
-        ratings = np.genfromtxt(args.get('--filename'))
+        return 'linear'
 
-    categories = int(np.amax(ratings)) + 1
-    subjects = ratings.size / 2
+def read_ratings(csv, filename):
+    if csv:
+        return np.genfromtxt(filename, delimiter=',')
+    else:
+        return np.genfromtxt(filename)
 
-    # Build weight matrix
+def build_weight_matrix(categories, mode):
     weighted = np.empty((categories, categories))
     for i in range(categories):
         for j in range(categories):
@@ -38,7 +42,9 @@ def main(args):
                 weighted[i, j] = abs(i - j)
                 mode = 'equal weights'
 
-    # Build observed matrix
+    return weighted
+
+def build_observed_matrix(categories, subjects, ratings):
     observed = np.zeros((categories, categories))
     distributions = np.zeros((categories, 2))
     for k in range(subjects):
@@ -46,18 +52,31 @@ def main(args):
         distributions[ratings[k, 0], 0] += 1
         distributions[ratings[k, 1], 1] += 1
 
-    # Normalize observed and distribution arrays
     observed = observed / subjects
     distributions = distributions / subjects
 
-    # Build expected array
+    return observed, distributions
+
+def build_expected_matrix(categories, distributions):
     expected = np.empty((categories, categories))
     for i in range(categories):
         for j in range(categories):
             expected[i, j] = distributions[i, 0] * distributions[j, 1]
 
-    # Calculate kappa
-    kappa = 1.0 - (sum(sum(weighted * observed)) / sum(sum(weighted * expected)))
+    return expected
+
+def calculate_kappa(weighted, observed, expected):
+    return 1.0 - (sum(sum(weighted * observed)) / sum(sum(weighted * expected)))
+
+def main(args):
+    mode = get_mode(args)
+    ratings = read_ratings(args.get('--csv'), args.get('--filename'))
+    categories = int(np.amax(ratings)) + 1
+    subjects = ratings.size / 2
+    weighted = build_weight_matrix(categories, mode)
+    observed, distributions = build_observed_matrix(categories, subjects, ratings)
+    expected = build_expected_matrix(categories, distributions)
+    kappa = calculate_kappa(weighted, observed, expected)
 
     if args.get('--verbose'):
         print('Kappa (' + mode + '):')
