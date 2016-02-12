@@ -32,15 +32,12 @@ def build_weight_matrix(categories, mode):
     weighted = np.empty((categories, categories))
     for i in range(categories):
         for j in range(categories):
-            if args.get('--unweighted'):
+            if mode == 'unweighted':
                 weighted[i, j] = (i != j)
-                mode = 'unweighted'
-            elif args.get('--squared'):
+            elif mode == 'squared':
                 weighted[i, j] = abs(i - j) ** 2
-                mode = 'squared'
             else:  #linear
                 weighted[i, j] = abs(i - j)
-                mode = 'equal weights'
 
     return weighted
 
@@ -85,6 +82,8 @@ def main(args):
         print('Subjects: ' + str(subjects))
     else:
         print(kappa)
+
+    return kappa
 
 
 if __name__ == "__main__":
