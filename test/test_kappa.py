@@ -50,18 +50,14 @@ def test_build_weight_matrix_linear():
     assert weighted[2][2] == 0
 
 def test_build_observed_matrix_simple():
-    observed, distributions = kappa.build_observed_matrix(2, 3, np.array([[0, 1], [1, 1], [0, 0]]))
+    observed = kappa.build_observed_matrix(2, 3, np.array([[0, 1], [1, 1], [0, 0]]))
     assert observed[0, 0] == 1.0 / 3
     assert observed[0, 1] == 1.0 / 3
     assert observed[1, 0] == 0
     assert observed[1, 1] == 1.0 / 3
-    assert distributions[0, 0] == 2.0 / 3
-    assert distributions[1, 0] == 1.0 / 3
-    assert distributions[0, 1] == 1.0 / 3
-    assert distributions[1, 1] == 2.0 / 3
 
 def test_build_observed_matrix_longer():
-    observed, distributions = kappa.build_observed_matrix(3, 5, np.array([[0, 1], [2, 2], [1, 1], [0, 2], [1, 1]]))
+    observed = kappa.build_observed_matrix(3, 5, np.array([[0, 1], [2, 2], [1, 1], [0, 2], [1, 1]]))
     assert observed[0, 0] == 0
     assert observed[0, 1] == 1.0 / 5
     assert observed[0, 2] == 1.0 / 5
@@ -71,6 +67,16 @@ def test_build_observed_matrix_longer():
     assert observed[2, 0] == 0
     assert observed[2, 1] == 0
     assert observed[2, 2] == 1.0 / 5
+
+def test_build_distributions_matrix_simple():
+    distributions = kappa.build_distributions_matrix(2, 3, np.array([[0, 1], [1, 1], [0, 0]]))
+    assert distributions[0, 0] == 2.0 / 3
+    assert distributions[1, 0] == 1.0 / 3
+    assert distributions[0, 1] == 1.0 / 3
+    assert distributions[1, 1] == 2.0 / 3
+
+def test_build_distributions_matrix_longer():
+    distributions = kappa.build_distributions_matrix(3, 5, np.array([[0, 1], [2, 2], [1, 1], [0, 2], [1, 1]]))
     assert distributions[0, 0] == 2.0 / 5
     assert distributions[0, 1] == 0
     assert distributions[1, 0] == 2.0 / 5

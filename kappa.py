@@ -43,16 +43,18 @@ def build_weight_matrix(categories, mode):
 
 def build_observed_matrix(categories, subjects, ratings):
     observed = np.zeros((categories, categories))
-    distributions = np.zeros((categories, 2))
     for k in range(subjects):
         observed[ratings[k, 0], ratings[k, 1]] += 1
+
+    return observed / subjects
+
+def build_distributions_matrix(categories, subjects, ratings):
+    distributions = np.zeros((categories, 2))
+    for k in range(subjects):
         distributions[ratings[k, 0], 0] += 1
         distributions[ratings[k, 1], 1] += 1
 
-    observed = observed / subjects
-    distributions = distributions / subjects
-
-    return observed, distributions
+    return distributions / subjects
 
 def build_expected_matrix(categories, distributions):
     expected = np.empty((categories, categories))
@@ -71,7 +73,8 @@ def main(args):
     categories = int(np.amax(ratings)) + 1
     subjects = ratings.size / 2
     weighted = build_weight_matrix(categories, mode)
-    observed, distributions = build_observed_matrix(categories, subjects, ratings)
+    observed = build_observed_matrix(categories, subjects, ratings)
+    distributions = build_distributions_matrix(categories, subjects, ratings)
     expected = build_expected_matrix(categories, distributions)
     kappa = calculate_kappa(weighted, observed, expected)
 
