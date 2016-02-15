@@ -29,17 +29,27 @@ def read_ratings(csv, filename):
         return np.genfromtxt(filename)
 
 def build_weight_matrix(categories, mode):
-    weighted = np.empty((categories, categories))
-    for i in range(categories):
-        for j in range(categories):
-            if mode == 'unweighted':
-                weighted[i, j] = (i != j)
-            elif mode == 'squared':
-                weighted[i, j] = abs(i - j) ** 2
-            else:  #linear
-                weighted[i, j] = abs(i - j)
-
-    return weighted
+    if mode == 'unweighted':
+        # [[0, 1, 1],
+        #  [1, 0, 1],
+        #  [1, 1, 0]]
+        return np.fromiter((i != j
+            for i in range(categories)
+            for j in range(categories)), np.int).reshape(categories, -1)
+    elif mode == 'squared':
+        # [[0, 1, 4],
+        #  [1, 0, 1],
+        #  [4, 1, 0]]
+        return np.fromiter((abs(i - j) ** 2
+            for i in range(categories)
+            for j in range(categories)), np.int).reshape(categories, -1)
+    else: # linear
+        # [[0, 1, 2],
+        #  [1, 0, 1],
+        #  [2, 1, 0]]
+        return np.fromiter((abs(i - j)
+            for i in range(categories)
+            for j in range(categories)), np.int).reshape(categories, -1)
 
 def build_observed_matrix(categories, subjects, ratings):
     observed = np.zeros((categories, categories))
@@ -57,12 +67,9 @@ def build_distributions_matrix(categories, subjects, ratings):
     return distributions / subjects
 
 def build_expected_matrix(categories, distributions):
-    expected = np.empty((categories, categories))
-    for i in range(categories):
-        for j in range(categories):
-            expected[i, j] = distributions[i, 0] * distributions[j, 1]
-
-    return expected
+    return np.fromiter((distributions[i, 0] * distributions[j, 1]
+        for i in range(categories)
+        for j in range(categories)), np.float).reshape(categories, -1)
 
 def calculate_kappa(weighted, observed, expected):
     return 1.0 - (sum(sum(weighted * observed)) / sum(sum(weighted * expected)))
@@ -87,7 +94,6 @@ def main(args):
         print(kappa)
 
     return kappa
-
 
 if __name__ == "__main__":
     args = docopt(usage, argv=None, help=True, version=None, options_first=False)

@@ -1,6 +1,8 @@
 import numpy as np
 import kappa
 
+EPSILON = 0.0001
+
 def test_sanity():
     assert True
 
@@ -12,6 +14,7 @@ def test_get_mode():
 
 def test_build_weight_matrix_unweighted():
     weighted = kappa.build_weight_matrix(3, 'unweighted')
+    print weighted
     assert weighted.size == 9
     assert weighted[0][0] == 0
     assert weighted[0][1] == 1
@@ -83,3 +86,15 @@ def test_build_distributions_matrix_longer():
     assert distributions[1, 1] == 3.0 / 5
     assert distributions[2, 0] == 1.0 / 5
     assert distributions[2, 1] == 2.0 / 5
+
+def test_build_expected_matrix():
+    expected = kappa.build_expected_matrix(3, np.array([[.4, 0], [.4, .6], [.2, .4]]))
+    assert abs(expected[0, 0] - 0) < EPSILON
+    assert abs(expected[0, 1] - .24) < EPSILON
+    assert abs(expected[0, 2] - .16) < EPSILON
+    assert abs(expected[1, 0] - 0) < EPSILON
+    assert abs(expected[1, 1] - .24) < EPSILON
+    assert abs(expected[1, 2] - .16) < EPSILON
+    assert abs(expected[2, 0] - 0) < EPSILON
+    assert abs(expected[2, 1] - .12) < EPSILON
+    assert abs(expected[2, 2] - .08) < EPSILON
