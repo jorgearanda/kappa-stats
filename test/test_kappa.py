@@ -1,5 +1,6 @@
 import numpy as np
 import kappa
+from nose.tools import assert_raises
 
 EPSILON = 0.0001
 
@@ -98,3 +99,28 @@ def test_build_expected_matrix():
     assert abs(expected[2, 0] - 0) < EPSILON
     assert abs(expected[2, 1] - .12) < EPSILON
     assert abs(expected[2, 2] - .08) < EPSILON
+
+def test_calculation_on_wikipedia_example_2():
+    assert abs(kappa.main({'--filename': 'test/fixtures/wikipedia_example_2.txt'}) - 0.1304) < EPSILON
+
+def test_calculation_on_wikipedia_example_3():
+    assert abs(kappa.main({'--filename': 'test/fixtures/wikipedia_example_3.txt'}) - 0.2593) < EPSILON
+
+def test_calculation_on_perfect_agreement():
+    assert abs(kappa.main({'--filename': 'test/fixtures/perfect_agreement.txt'}) - 1.0) < EPSILON
+
+def test_calculation_with_csvs():
+    assert abs(kappa.main({'--csv': True, '--filename': 'test/fixtures/comma_separated.txt'}) - 0.16) < EPSILON
+
+def test_verbose_does_not_break():
+    assert abs(kappa.main({'--verbose': True, '--csv': True, '--filename': 'test/fixtures/comma_separated.txt'}) - 0.16) < EPSILON
+
+def test_all_zeroes_does_not_break():
+    assert abs(kappa.main({'--filename': 'test/fixtures/all_zeroes.txt'}) - 1.0) < EPSILON
+
+def test_bad_filenames_exit():
+    assert_raises(SystemExit, kappa.main, {'--filename': 'does_not_exist.txt'})
+
+def test_bad_input_exits():
+    assert_raises(SystemExit, kappa.main, {'--filename': 'test/fixtures/invalid_data.txt'})
+    assert_raises(SystemExit, kappa.main, {'--filename': 'test/fixtures/missing_data.txt'})

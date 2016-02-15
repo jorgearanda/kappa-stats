@@ -2,6 +2,7 @@
 
 from docopt import docopt
 import numpy as np
+import sys
 
 usage = """Usage: kappa.py [--help] [--linear|--unweighted|--squared] [--verbose] [--csv] --filename <filename>
 
@@ -23,10 +24,17 @@ def get_mode(args):
         return 'linear'
 
 def read_ratings(csv, filename):
-    if csv:
-        return np.genfromtxt(filename, delimiter=',')
-    else:
-        return np.genfromtxt(filename)
+    try:
+        if csv:
+            return np.genfromtxt(filename, delimiter=',')
+        else:
+            return np.genfromtxt(filename)
+    except(IOError):
+        print('Bad filename: ' + filename)
+        sys.exit(1)
+    except(ValueError):
+        print('Invalid input (the same number of integers required in each row)')
+        sys.exit(1)
 
 def build_weight_matrix(categories, mode):
     if mode == 'unweighted':
@@ -72,12 +80,17 @@ def build_expected_matrix(categories, distributions):
         for j in range(categories)), np.float).reshape(categories, -1)
 
 def calculate_kappa(weighted, observed, expected):
-    return 1.0 - (sum(sum(weighted * observed)) / sum(sum(weighted * expected)))
+    sum_expected = sum(sum(weighted * expected))
+    return 1.0 - ((sum(sum(weighted * observed)) / sum_expected) if sum_expected != 0 else 0.0)
 
 def main(args):
     mode = get_mode(args)
     ratings = read_ratings(args.get('--csv'), args.get('--filename'))
-    categories = int(np.amax(ratings)) + 1
+    try:
+        categories = int(np.amax(ratings)) + 1
+    except(ValueError):
+        print('Invalid input (integers required)')
+        sys.exit(1)
     subjects = ratings.size / 2
     weighted = build_weight_matrix(categories, mode)
     observed = build_observed_matrix(categories, subjects, ratings)
