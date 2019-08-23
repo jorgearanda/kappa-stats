@@ -1,3 +1,4 @@
+import pytest
 import numpy as np
 import kappa
 from nose.tools import assert_raises
@@ -15,7 +16,7 @@ def test_get_mode():
 
 def test_build_weight_matrix_unweighted():
     weighted = kappa.build_weight_matrix(3, 'unweighted')
-    print weighted
+    print(weighted)
     assert weighted.size == 9
     assert weighted[0][0] == 0
     assert weighted[0][1] == 1
@@ -119,8 +120,12 @@ def test_all_zeroes_does_not_break():
     assert abs(kappa.main({'--filename': 'test/fixtures/all_zeroes.txt'}) - 1.0) < EPSILON
 
 def test_bad_filenames_exit():
-    assert_raises(SystemExit, kappa.main, {'--filename': 'does_not_exist.txt'})
+    with pytest.raises(SystemExit):
+        kappa.main({'--filename': 'does_not_exist.txt'})
 
-def test_bad_input_exits():
-    assert_raises(SystemExit, kappa.main, {'--filename': 'test/fixtures/invalid_data.txt'})
-    assert_raises(SystemExit, kappa.main, {'--filename': 'test/fixtures/missing_data.txt'})
+def test_bad_input_exits():    
+    with pytest.raises(IndexError):
+        kappa.main({'--filename': 'test/fixtures/invalid_data.txt'})
+    
+    with pytest.raises(SystemExit):
+        kappa.main({'--filename': 'test/fixtures/missing_data.txt'})

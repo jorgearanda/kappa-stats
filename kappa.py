@@ -26,9 +26,9 @@ def get_mode(args):
 def read_ratings(csv, filename):
     try:
         if csv:
-            return np.genfromtxt(filename, delimiter=',')
+            return np.genfromtxt(filename, delimiter=',').astype(int)
         else:
-            return np.genfromtxt(filename)
+            return np.genfromtxt(filename).astype(int)
     except(IOError):
         print('Bad filename: ' + filename)
         sys.exit(1)
@@ -91,7 +91,7 @@ def main(args):
     except(ValueError):
         print('Invalid input (integers required)')
         sys.exit(1)
-    subjects = ratings.size / 2
+    subjects = int(ratings.size / 2)
     weighted = build_weight_matrix(categories, mode)
     observed = build_observed_matrix(categories, subjects, ratings)
     distributions = build_distributions_matrix(categories, subjects, ratings)

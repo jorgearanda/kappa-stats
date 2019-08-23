@@ -8,7 +8,7 @@ A good source to understand these measures:
 http://en.wikipedia.org/wiki/Cohen%27s_kappa
 
 ## Requirements
-* Python 2.x
+* Python 3.x
 * NumPy
 * docopt
 
@@ -23,3 +23,9 @@ http://en.wikipedia.org/wiki/Cohen%27s_kappa
     -v, --verbose                         Include number of categories and subjects in the output
     -c, --csv                             For text files with comma-separated values
     -f <filename>, --filename <filename>  The filename to process, with pairs of integers on each line. The values in each pair correspond to the rating that each of the two reviewers gave to a particular subject. The pairs must be whitespaced-separated (or comma-separated, with the -c flag).
+
+## Running the Tests
+
+From the command line, use the following command to run the testcases
+    
+    python -m pytest 
