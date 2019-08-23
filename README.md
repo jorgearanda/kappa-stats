@@ -14,6 +14,13 @@ http://en.wikipedia.org/wiki/Cohen%27s_kappa
 
 ## Usage
 
+### Example
+For a quick example you can run kappa.py with one of the fixture files, e.g.
+
+    python kappa.py -cv -f test/fixtures/comma_separated.txt -u
+
+### Command line Options
+
     kappa.py [--help] [--linear|--unweighted|--squared] [--verbose] [--csv] --filename <filename>
 
     -h, --help                            Show this
@@ -26,6 +33,6 @@ http://en.wikipedia.org/wiki/Cohen%27s_kappa
 
 ## Running the Tests
 
-From the command line, use the following command to run the testcases
+From the command line, use the following command to run the test cases
     
     python -m pytest 

@@ -1,7 +1,6 @@
 import pytest
 import numpy as np
 import kappa
-from nose.tools import assert_raises
 
 EPSILON = 0.0001
 
