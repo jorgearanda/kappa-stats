@@ -34,5 +34,5 @@ For a quick example you can run kappa.py with one of the fixture files, e.g.
 ## Running the Tests
 
 From the command line, use the following command to run the test cases
-    
-    python -m pytest 
+
+    python -m pytest
